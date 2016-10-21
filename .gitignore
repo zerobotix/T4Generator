@@ -1,0 +1,10 @@
+/T4Generator/.vs
+/T4Generator/packages
+/T4Generator/SampleClassLibrary/obj
+/T4Generator/SampleClassLibrary/bin
+/T4Generator/SampleLibrary/bin
+/T4Generator/SampleLibrary/obj
+/T4Generator/SampleWebApi/bin
+/T4Generator/SampleWebApi/obj
+/T4Generator/T4Generator/bin
+/T4Generator/T4Generator/obj
