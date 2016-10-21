@@ -58,12 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GenerateInterface.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>GenerateInterface.tt</DependentUpon>
-    </Compile>
-    <Compile Include="MethodInfoExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -73,20 +67,28 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GenerateInterface.cs</LastGenOutput>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CodeGeneration\CodeGeneration.csproj">
+      <Project>{557421c3-11ba-48c5-8fc8-01cbc38a236c}</Project>
+      <Name>CodeGeneration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SampleClassLibrary\SampleClassLibrary.csproj">
       <Project>{a2b76b3d-84ec-413b-b798-4c38aa44353a}</Project>
       <Name>SampleClassLibrary</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SampleWebApi\SampleWebApi.csproj">
-      <Project>{681fd891-2e9f-4d37-92de-d5ae039bf602}</Project>
-      <Name>SampleWebApi</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GenerateClient.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GenerateClient.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

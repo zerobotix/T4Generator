@@ -4,13 +4,12 @@ using System.Net.Http;
 
 namespace SampleClassLibrary
 {
-    public class SampleClient : BaseService, SampleClassLibrary.ISampleClient ////, IAlertTemplatesClient
+    public class SampleClient : BaseClient, SampleClassLibrary.ISampleClient ////, IAlertTemplatesClient
     {
-        public SampleClient(HttpClient client)
-            : base(client)
-        {
-
-        }
+        //public SampleClient(HttpClient client)
+        //    : base(client)
+        //{
+        //}
 
         public List<int> GetUserAlertTemplates(string userContext)
         {

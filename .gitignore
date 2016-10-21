@@ -8,3 +8,7 @@
 /T4Generator/SampleWebApi/obj
 /T4Generator/T4Generator/bin
 /T4Generator/T4Generator/obj
+/T4Generator/CodeGeneration/bin
+/T4Generator/CodeGeneration/obj
+/T4Generator/Templates/bin
+/T4Generator/Templates/obj
