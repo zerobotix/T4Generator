@@ -33,16 +33,28 @@ namespace CodeGeneration
         public static string GenerateClientMethodForControllerAction(MethodInfo method)
         {
             var httpMethod = GetHttpMethod(method);
+
             var routeTemplate = method.GetCustomAttribute<RouteAttribute>().Template;
             var routeUrl = Regex.Replace(routeTemplate, @":\w+", string.Empty); // remove type constraints
 
+            var methodSignatureWithoutParameters = Reflector.BuildReturnSignature(method, true, false);
+            var parameters = Reflector.BuildParametersList(method, false);
+            var methodSignature = $"{ methodSignatureWithoutParameters }(UserContextContract userContext,{parameters})";
+
+            var returnType = Reflector.TypeName(method.ReturnType);
+            var isVoid = returnType == "void";
+
+            var sendRequestBlock = isVoid
+                ? "SendRequest(request);"
+                : $"return SendRequest<{ returnType }>(request);";
+
             var generatedMethod = $@"
-                { Reflector.GetSignature(method) } 
+                { methodSignature } 
                 {{ 
                     var url = $""{ routeUrl }"";
-                    var request = CreateRequest({ httpMethod }, url);
-                    var response = SendRequest<{ Reflector.TypeName(method.ReturnType) }>(request);
-                    return response;
+                    var request = CreateRequest(userContext, { httpMethod }, url);
+
+                    {sendRequestBlock}
                 }}
             "; // count of extra-spaces is calculated from this line
 

@@ -21,8 +21,11 @@ namespace SampleClassLibrary
         public T SendRequest<T>(HttpRequestMessage request)
         {
             var result = new object();
-
             return (T)result;
+        }
+
+        public void SendRequest(HttpRequestMessage request)
+        {
         }
     }
 }

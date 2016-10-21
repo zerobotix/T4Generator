@@ -4,29 +4,21 @@
 	assembly path: http://stackoverflow.com/questions/16962170/t4-template-adding-assembly-of-existing-project-in-solution 
 */ #>
 
-<#@ template debug="false" hostspecific="false" language="C#" #>
+<##>
+<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(TargetDir)SampleClassLibrary.dll" #> <# /* another DLL that referenced in current project */ #>
-<#@ assembly name="$(TargetDir)System.Web.Http.dll" #> <# /* another DLL that referenced in current project */ #>
-<#@ assembly name="$(TargetPath)" #> <# /* current DLL */ #>
-
-
-
-
-
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Web.Http" #>
+<#@ assembly name="$(SolutionDir)SampleClassLibrary\bin\Debug\SampleClassLibrary.dll" #>
+<#@ assembly name="$(SolutionDir)CodeGeneration\bin\Debug\CodeGeneration.dll" #>
+<##>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Reflection" #>
 <#@ import namespace="SampleClassLibrary" #>
-<#@ import namespace="T4Generator" #>
-
+<#@ import namespace="CodeGeneration" #>
+<##>
 <#@ output extension=".cs" #>
-
-<# 
-	var generatedClientCode = Program.GenerateClientClassForController<SampleController>();
-#>
+<##>
+<# var generatedClientCode = Generator.GenerateClientClassForController<SampleController>(); #>
+<##>
 
 using System;
 using System.Collections.Generic;
@@ -36,7 +28,7 @@ using SampleClassLibrary;
 
 namespace Clients
 {
-    <#= generatedClientCode #>;
+    <#= generatedClientCode #>
 }
 
 

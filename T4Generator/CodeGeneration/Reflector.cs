@@ -25,63 +25,13 @@ namespace CodeGeneration
         {
             var sigBuilder = new StringBuilder();
 
-            BuildReturnSignature(sigBuilder, method, withAccessModifier, callable);
+            sigBuilder.Append(BuildReturnSignature(method, withAccessModifier, callable));
 
             sigBuilder.Append("(");
-            var firstParam = true;
-            var secondParam = false;
-
-            var parameters = method.GetParameters();
-
-            foreach (var param in parameters)
-            {
-                if (firstParam)
-                {
-                    firstParam = false;
-                    if (method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
-                    {
-                        if (callable)
-                        {
-                            secondParam = true;
-                            continue;
-                        }
-                        sigBuilder.Append("this ");
-                    }
-                }
-                else if (secondParam == true)
-                    secondParam = false;
-                else
-                    sigBuilder.Append(", ");
-                if (param.IsOut)
-                    sigBuilder.Append("out ");
-                else if (param.ParameterType.IsByRef)
-                    sigBuilder.Append("ref ");
-
-                if (IsParamArray(param))
-                {
-                    sigBuilder.Append("params ");
-                }
-
-                if (!callable)
-                {
-                    sigBuilder.Append(TypeName(param.ParameterType));
-                    sigBuilder.Append(' ');
-                }
-
-
-                sigBuilder.Append(param.Name);
-
-                if (param.IsOptional)
-                {
-                    sigBuilder.Append(" = " +
-                        (param.DefaultValue ?? "null")
-                    );
-                }
-            }
+            sigBuilder.Append(BuildParametersList(method, callable));
             sigBuilder.Append(")");
 
             // generic constraints
-
 
             foreach (var arg in method.GetGenericArguments())
             {
@@ -108,6 +58,69 @@ namespace CodeGeneration
                 if (constraints.Count > 0)
                 {
                     sigBuilder.Append(" where " + TypeName(arg) + ": " + String.Join(", ", constraints));
+                }
+            }
+
+            return sigBuilder.ToString();
+        }
+
+        public static string BuildParametersList(MethodInfo method, bool callable)
+        {
+            var sigBuilder = new StringBuilder();
+
+            var firstParam = true;
+            var secondParam = false;
+
+            var parameters = method.GetParameters();
+
+            foreach (var param in parameters)
+            {
+                if (firstParam)
+                {
+                    firstParam = false;
+                    if (method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
+                    {
+                        if (callable)
+                        {
+                            secondParam = true;
+                            continue;
+                        }
+                        sigBuilder.Append("this ");
+                    }
+                }
+                else if (secondParam == true)
+                {
+                    secondParam = false;
+                }
+                else
+                {
+                    sigBuilder.Append(", ");
+                }
+                if (param.IsOut)
+                {
+                    sigBuilder.Append("out ");
+                }
+                else if (param.ParameterType.IsByRef)
+                {
+                    sigBuilder.Append("ref ");
+                }
+
+                if (IsParamArray(param))
+                {
+                    sigBuilder.Append("params ");
+                }
+
+                if (!callable)
+                {
+                    sigBuilder.Append(TypeName(param.ParameterType));
+                    sigBuilder.Append(' ');
+                }
+
+                sigBuilder.Append(param.Name);
+
+                if (param.IsOptional)
+                {
+                    sigBuilder.Append(" = " + (param.DefaultValue ?? "null"));
                 }
             }
 
@@ -179,8 +192,9 @@ namespace CodeGeneration
             return sb.ToString();
         }
 
-        private static void BuildReturnSignature(StringBuilder sigBuilder, MethodInfo method, bool withAccessModifier, bool callable)
+        public static string BuildReturnSignature(MethodInfo method, bool withAccessModifier, bool callable)
         {
+            var sigBuilder = new StringBuilder();
             var firstParam = true;
             if (!callable)
             {
@@ -209,6 +223,7 @@ namespace CodeGeneration
                 sigBuilder.Append(">");
             }
 
+            return sigBuilder.ToString();
         }
 
         public static string Visibility(MethodInfo method)
@@ -249,7 +264,7 @@ namespace CodeGeneration
             var sigBuilder = new StringBuilder();
             var primaryDef = LeastRestrictiveVisibility(getter, setter);
 
-            BuildReturnSignature(sigBuilder, primaryDef, true, false);
+            sigBuilder.Append(BuildReturnSignature(primaryDef, true, false));
             sigBuilder.Append(" { ");
             if (getter != null)
             {

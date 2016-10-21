@@ -4,9 +4,14 @@
 	assembly path: http://stackoverflow.com/questions/16962170/t4-template-adding-assembly-of-existing-project-in-solution 
 */ #>
 
-<#@ template debug="false" hostspecific="false" language="C#" #>
+// TargetDir:   <#= Host.ResolveAssemblyReference("$(TargetDir)") #>
+// TargetPath:  <#= Host.ResolveAssemblyReference("$(TargetPath)") #>
+// SolutionDir: <#= Host.ResolveAssemblyReference("$(SolutionDir)") #>
+
+<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="$(TargetDir)SampleClassLibrary.dll" #> <# /* another DLL that referenced in current project */ #>
+<#@ assembly name="$(TargetDir)CodeGeneration.dll" #> <# /* another DLL that referenced in current project */ #>
 <#@ assembly name="$(TargetPath)" #> <# /* current DLL */ #>
 
 <#@ import namespace="System.Linq" #>
@@ -14,7 +19,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Reflection" #>
 <#@ import namespace="SampleClassLibrary" #>
-<#@ import namespace="T4Generator" #>
+<#@ import namespace="CodeGeneration" #>
 
 <#@ output extension=".cs" #>
 
@@ -27,7 +32,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SampleClassLibrary
+namespace Interfaces
 {
     public interface I<#=className#>Generated
     {
