@@ -10,6 +10,10 @@
 <#@ assembly name="$(TargetDir)System.Web.Http.dll" #> <# /* another DLL that referenced in current project */ #>
 <#@ assembly name="$(TargetPath)" #> <# /* current DLL */ #>
 
+
+
+
+
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Web.Http" #>
