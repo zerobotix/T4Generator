@@ -14,7 +14,7 @@ namespace ConsoleApplication
     {
         static void Main(string[] args)
         {
-            //var generatedCode = Generator.GenerateClientClassForController<SampleController>();
+            //var generatedCode = Generator.GenerateClientClass<SampleController>();
             var generatedCode = Generator.GenerateInterface<SampleController>();
             Console.WriteLine(generatedCode);
             Console.ReadKey();

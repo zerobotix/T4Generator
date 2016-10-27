@@ -5,7 +5,7 @@ using System.Web.Http;
 namespace SampleClassLibrary
 {
     [RoutePrefix("v1")]
-    public class SampleController
+    public class SampleController //: ApiController
     {
         [Route("shut-the-fuck-up")]
         [HttpPost]

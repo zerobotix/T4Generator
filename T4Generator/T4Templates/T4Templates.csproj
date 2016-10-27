@@ -40,21 +40,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExampleGenerator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExampleGenerator.tt</DependentUpon>
+    </Compile>
     <Compile Include="GenerateClient.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>GenerateClient.tt</DependentUpon>
     </Compile>
+    <Compile Include="GenerateInterface.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GenerateInterface.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GenerateInterface.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GenerateInterface.cs</LastGenOutput>
+    </Content>
     <Content Include="GenerateClient.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GenerateClient.cs</LastGenOutput>
     </Content>
-    <None Include="GenerateInterface.tt">
+    <None Include="ExampleGenerator.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GenerateInterface.cs</LastGenOutput>
+      <LastGenOutput>ExampleGenerator.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

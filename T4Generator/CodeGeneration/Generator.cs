@@ -8,54 +8,7 @@ namespace CodeGeneration
 {
     public static class Generator
     {
-        private static string GetHttpMethod(MethodInfo method)
-        {
-            string verb = nameof(HttpMethod.Get);
-
-            if (method.GetCustomAttribute<HttpGetAttribute>() != null)
-                verb = nameof(HttpMethod.Get);
-            else if (method.GetCustomAttribute<HttpPostAttribute>() != null)
-                verb = nameof(HttpMethod.Post);
-            else if (method.GetCustomAttribute<HttpPutAttribute>() != null)
-                verb = nameof(HttpMethod.Put);
-            else if (method.GetCustomAttribute<HttpDeleteAttribute>() != null)
-                verb = nameof(HttpMethod.Delete);
-
-            var httpMethod = $"{nameof(HttpMethod)}.{verb}";
-
-            return httpMethod;
-        }
-
-        public static string GenerateClientMethodForControllerAction(MethodInfo method)
-        {
-            var httpMethod = GetHttpMethod(method);
-
-            var routeTemplate = method.GetCustomAttribute<RouteAttribute>().Template;
-            var routeUrl = Regex.Replace(routeTemplate, @":\w+", string.Empty); // url/{symbolId:int} -> url/{symbolId}
-
-            var parameters = Reflector.BuildParametersList(method, false);
-            var parametersWithContext = "UserContextContract userContext" + (parameters.Length == 0 ? "" : ", " + parameters) ;
-
-            var returnType = Reflector.TypeName(method.ReturnType);
-
-            var sendRequestBlock = returnType == "void"
-                ? "SendRequest(request);"
-                : $"return SendRequest<{returnType}>(request);";
-
-            var generatedMethod = $@"
-                public {returnType} {method.Name}({parametersWithContext})
-                {{ 
-                    var url = $""{routeUrl}"";
-                    var request = CreateRequest(userContext, {httpMethod}, url);
-
-                    {sendRequestBlock}
-                }}
-            ";
-
-            return generatedMethod.Indent();
-        }
-
-        public static string GenerateClientClassForController<T>() where T : class // where T : Controller
+        public static string GenerateClientClass<T>() //where T : ApiController
         {
             var type = typeof(T);
 
@@ -70,16 +23,47 @@ namespace CodeGeneration
                 methodsBuilder.Append(generatedMethod);
                 methodsBuilder.AppendLine();
             }
-            var methods = methodsBuilder.ToString().Trim();
+            var classMethods = methodsBuilder.ToString().Trim();
 
             var generatedClass = $@"
                 public class {name}Client : BaseClient, I{name}Client
                 {{ 
-                    {methods}
+                    {classMethods}
                 }}
             ";
 
             return generatedClass.Indent();
+        }
+
+        public static string GenerateClientInterface<T>() //where T : ApiController
+        {
+            var type = typeof(T);
+
+            var name = type.Name.Remove(type.Name.IndexOf("Controller"));
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+            var methodsBuilder = new StringBuilder();
+            foreach (var method in methodInfos)
+            {
+                var returnType = Reflector.TypeName(method.ReturnType);
+                var parameters = GenerateClientMethodParameters(method);
+                var methodSignature = $"{returnType} {method.Name}({parameters})";
+                methodsBuilder
+                    .Append(methodSignature)
+                    .Append(";")
+                    .AppendLine();
+            }
+            var interfaceMethods = methodsBuilder.ToString().Trim();
+
+            var generatedInterface = $@"
+                public interface I{name}Client
+                {{
+                    {interfaceMethods}
+                }}
+            ";
+
+            return generatedInterface.Indent();
         }
 
         public static string GenerateInterface<T>() where T : class
@@ -107,6 +91,60 @@ namespace CodeGeneration
             ";
 
             return generatedInterface.Indent();
+        }
+
+        private static string GetHttpMethod(MethodInfo method)
+        {
+            string verb = nameof(HttpMethod.Get);
+
+            if (method.GetCustomAttribute<HttpGetAttribute>() != null)
+                verb = nameof(HttpMethod.Get);
+            else if (method.GetCustomAttribute<HttpPostAttribute>() != null)
+                verb = nameof(HttpMethod.Post);
+            else if (method.GetCustomAttribute<HttpPutAttribute>() != null)
+                verb = nameof(HttpMethod.Put);
+            else if (method.GetCustomAttribute<HttpDeleteAttribute>() != null)
+                verb = nameof(HttpMethod.Delete);
+
+            var httpMethod = $"{nameof(HttpMethod)}.{verb}";
+
+            return httpMethod;
+        }
+
+        private static string GenerateClientMethodForControllerAction(MethodInfo method)
+        {
+            var httpMethod = GetHttpMethod(method);
+
+            var routeTemplate = method.GetCustomAttribute<RouteAttribute>().Template;
+            var routeUrl = Regex.Replace(routeTemplate, @":\w+", string.Empty); // url/{symbolId:int} -> url/{symbolId}
+
+            var parameters = GenerateClientMethodParameters(method);
+
+            var returnType = Reflector.TypeName(method.ReturnType);
+
+            var sendRequestBlock = returnType == "void"
+                ? "SendRequest(request);"
+                : $"return SendRequest<{returnType}>(request);";
+
+            var generatedMethod = $@"
+                public {returnType} {method.Name}({parameters})
+                {{ 
+                    var url = $""{routeUrl}"";
+                    var request = CreateRequest(userContext, {httpMethod}, url);
+
+                    {sendRequestBlock}
+                }}
+            ";
+
+            return generatedMethod.Indent();
+        }
+
+        private static string GenerateClientMethodParameters(MethodInfo method)
+        {
+            var parameters = Reflector.BuildParametersList(method, false);
+            var parametersWithContext = "UserContextContract userContext" + (parameters.Length == 0 ? "" : ", " + parameters);
+
+            return parametersWithContext;
         }
     }
 }
