@@ -3,6 +3,6 @@ namespace SampleClassLibrary
 {
     public interface ISampleClient
     {
-        System.Collections.Generic.List<int> GetUserAlertTemplates(string userContext);
+        System.Collections.Generic.List<int> GetUserAlertTemplates(UserContextContract userContext);
     }
 }

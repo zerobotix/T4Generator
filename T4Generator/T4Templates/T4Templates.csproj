@@ -45,11 +45,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>GenerateClient.tt</DependentUpon>
     </Compile>
-    <Compile Include="GenerateInterface.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>GenerateInterface.tt</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

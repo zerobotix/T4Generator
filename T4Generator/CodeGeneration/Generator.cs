@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace CodeGeneration
@@ -35,61 +31,82 @@ namespace CodeGeneration
             var httpMethod = GetHttpMethod(method);
 
             var routeTemplate = method.GetCustomAttribute<RouteAttribute>().Template;
-            var routeUrl = Regex.Replace(routeTemplate, @":\w+", string.Empty); // remove type constraints
+            var routeUrl = Regex.Replace(routeTemplate, @":\w+", string.Empty); // url/{symbolId:int} -> url/{symbolId}
 
-            var methodSignatureWithoutParameters = Reflector.BuildReturnSignature(method, true, false);
             var parameters = Reflector.BuildParametersList(method, false);
-            var methodSignature = $"{ methodSignatureWithoutParameters }(UserContextContract userContext,{parameters})";
+            var parametersWithContext = "UserContextContract userContext" + (parameters.Length == 0 ? "" : ", " + parameters) ;
 
             var returnType = Reflector.TypeName(method.ReturnType);
-            var isVoid = returnType == "void";
 
-            var sendRequestBlock = isVoid
+            var sendRequestBlock = returnType == "void"
                 ? "SendRequest(request);"
-                : $"return SendRequest<{ returnType }>(request);";
+                : $"return SendRequest<{returnType}>(request);";
 
             var generatedMethod = $@"
-                { methodSignature } 
+                public {returnType} {method.Name}({parametersWithContext})
                 {{ 
-                    var url = $""{ routeUrl }"";
-                    var request = CreateRequest(userContext, { httpMethod }, url);
+                    var url = $""{routeUrl}"";
+                    var request = CreateRequest(userContext, {httpMethod}, url);
 
                     {sendRequestBlock}
                 }}
-            "; // count of extra-spaces is calculated from this line
+            ";
 
-            // remove extra spaces at the start of the line
-            var lines = generatedMethod.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            var extraSpacesCount = lines.Last().Length;
-            var linesWithoutSpaces = lines.Select(x => x.Remove(0, extraSpacesCount));
-            var result = string.Join(Environment.NewLine, linesWithoutSpaces);
-
-            return result;
+            return generatedMethod.Indent();
         }
 
         public static string GenerateClientClassForController<T>() where T : class // where T : Controller
         {
-            var result = new StringBuilder();
             var type = typeof(T);
 
             var name = type.Name.Remove(type.Name.IndexOf("Controller"));
-            var classSignature = $@"public class {name}Client : BaseClient //, I{name}Client";
-
-            result.AppendLine(classSignature);
-            result.Append("{");
 
             MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
+            var methodsBuilder = new StringBuilder();
             foreach (var method in methodInfos)
             {
                 var generatedMethod = GenerateClientMethodForControllerAction(method);
-                result.AppendLine();
-                result.Append(generatedMethod);
+                methodsBuilder.Append(generatedMethod);
+                methodsBuilder.AppendLine();
             }
+            var methods = methodsBuilder.ToString().Trim();
 
-            result.AppendLine("}");
+            var generatedClass = $@"
+                public class {name}Client : BaseClient, I{name}Client
+                {{ 
+                    {methods}
+                }}
+            ";
 
-            return result.ToString();
+            return generatedClass.Indent();
+        }
+
+        public static string GenerateInterface<T>() where T : class
+        {
+            var type = typeof(T);
+
+            MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+            var methodsBuilder = new StringBuilder();
+            foreach (var method in methodInfos)
+            {
+                var methodSignature = Reflector.GetSignature(method, false);
+                methodsBuilder
+                    .Append(methodSignature)
+                    .Append(";")
+                    .AppendLine();
+            }
+            var methods = methodsBuilder.ToString().Trim();
+
+            var generatedInterface = $@"
+                public interface I{type.Name}
+                {{ 
+                    {methods}
+                }}
+            ";
+
+            return generatedInterface.Indent();
         }
     }
 }

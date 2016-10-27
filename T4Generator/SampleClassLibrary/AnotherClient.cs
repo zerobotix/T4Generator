@@ -4,7 +4,7 @@ using System.Net.Http;
 
 namespace SampleClassLibrary
 {
-    public class AnotherClient : BaseClient, SampleClassLibrary.ISampleClient ////, IAlertTemplatesClient
+    public class AnotherClient : BaseClient, ISampleClient ////, IAlertTemplatesClient
     {
         ////public AnotherClient(HttpClient client)
         ////    : base(client)
@@ -12,10 +12,10 @@ namespace SampleClassLibrary
 
         ////}
 
-        public List<int> GetUserAlertTemplates(string userContext)
+        public List<int> GetUserAlertTemplates(UserContextContract userContext)
         {
             var url = "alerttemplates";
-            var request = CreateRequest(HttpMethod.Get, url);
+            var request = CreateRequest(userContext, HttpMethod.Get, url);
             var response = SendRequest<List<int>>(request);
 
             return response;

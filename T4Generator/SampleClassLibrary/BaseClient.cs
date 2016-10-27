@@ -12,7 +12,7 @@ namespace SampleClassLibrary
         //{
         //}
 
-        public HttpRequestMessage CreateRequest(HttpMethod method, string url)
+        public HttpRequestMessage CreateRequest(UserContextContract userContext, HttpMethod method, string url)
         {
             var request = new HttpRequestMessage(method, url);
             return request;

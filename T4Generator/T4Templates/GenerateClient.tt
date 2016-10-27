@@ -3,7 +3,6 @@
 	tangible T4 Editor: https://visualstudiogallery.msdn.microsoft.com/784cf592-b797-4d4d-ad33-331fcf63faad
 	assembly path: http://stackoverflow.com/questions/16962170/t4-template-adding-assembly-of-existing-project-in-solution 
 */ #>
-
 <##>
 <#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
@@ -17,9 +16,8 @@
 <##>
 <#@ output extension=".cs" #>
 <##>
-<# var generatedClientCode = Generator.GenerateClientClassForController<SampleController>(); #>
+<# var generatedCode = Generator.GenerateClientClassForController<SampleController>().Indent(1).TrimStart(); #>
 <##>
-
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -28,7 +26,7 @@ using SampleClassLibrary;
 
 namespace Clients
 {
-    <#= generatedClientCode #>
+    <#= generatedCode #>
 }
 
 

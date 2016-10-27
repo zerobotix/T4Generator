@@ -57,7 +57,7 @@ namespace CodeGeneration
                 }
                 if (constraints.Count > 0)
                 {
-                    sigBuilder.Append(" where " + TypeName(arg) + ": " + String.Join(", ", constraints));
+                    sigBuilder.Append(" where " + TypeName(arg) + ": " + string.Join(", ", constraints));
                 }
             }
 
@@ -88,7 +88,7 @@ namespace CodeGeneration
                         sigBuilder.Append("this ");
                     }
                 }
-                else if (secondParam == true)
+                else if (secondParam)
                 {
                     secondParam = false;
                 }
@@ -96,6 +96,7 @@ namespace CodeGeneration
                 {
                     sigBuilder.Append(", ");
                 }
+
                 if (param.IsOut)
                 {
                     sigBuilder.Append("out ");

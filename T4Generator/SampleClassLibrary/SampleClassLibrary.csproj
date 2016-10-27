@@ -61,6 +61,7 @@
     <Compile Include="SampleEnum.cs" />
     <Compile Include="SampleOutputContract.cs" />
     <Compile Include="SampleInputContract.cs" />
+    <Compile Include="UserContextContract.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
