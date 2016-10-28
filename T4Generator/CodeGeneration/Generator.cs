@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Diagnostics;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,6 +9,14 @@ namespace CodeGeneration
 {
     public static class Generator
     {
+        public static Stopwatch Stopwatch;
+
+        static Generator()
+        {
+            Stopwatch = new Stopwatch();
+            Stopwatch.Start();
+        }
+
         public static string GenerateClientClass<T>() //where T : ApiController
         {
             var type = typeof(T);
@@ -47,8 +56,11 @@ namespace CodeGeneration
             foreach (var method in methodInfos)
             {
                 var returnType = Reflector.TypeName(method.ReturnType);
-                var parameters = GenerateClientMethodParameters(method);
-                var methodSignature = $"{returnType} {method.Name}({parameters})";
+
+                var parameters = Reflector.BuildParametersList(method, false);
+                var parametersWithContext = "UserContextContract userContext" + (parameters.Length == 0 ? "" : ", " + parameters);
+
+                var methodSignature = $"{returnType} {method.Name}({parametersWithContext})";
                 methodsBuilder
                     .Append(methodSignature)
                     .Append(";")
@@ -118,33 +130,36 @@ namespace CodeGeneration
             var routeTemplate = method.GetCustomAttribute<RouteAttribute>().Template;
             var routeUrl = Regex.Replace(routeTemplate, @":\w+", string.Empty); // url/{symbolId:int} -> url/{symbolId}
 
-            var parameters = GenerateClientMethodParameters(method);
-
             var returnType = Reflector.TypeName(method.ReturnType);
+
+            var parameters = Reflector.BuildParametersList(method, false);
+            var parametersWithContext = "UserContextContract userContext" + (parameters.Length == 0 ? "" : ", " + parameters);
+
+            var requestContentBlock = string.Empty;
+            var contractRegex = Regex.Match(parameters, @"(?<class>(\.|\w)+Contract) (?<parameter>\w+)");
+            if (contractRegex.Success)
+            {
+                var contractClass = contractRegex.Groups["class"].Value;
+                var contractParameter = contractRegex.Groups["parameter"].Value;
+
+                requestContentBlock =  $"request.Content = new ObjectContent<{contractClass}>({contractParameter}, _formatters[0]);";
+            }
 
             var sendRequestBlock = returnType == "void"
                 ? "SendRequest(request);"
                 : $"return SendRequest<{returnType}>(request);";
 
             var generatedMethod = $@"
-                public {returnType} {method.Name}({parameters})
+                public {returnType} {method.Name}({parametersWithContext})
                 {{ 
                     var url = $""{routeUrl}"";
                     var request = CreateRequest(userContext, {httpMethod}, url);
-
+                    {requestContentBlock}
                     {sendRequestBlock}
                 }}
             ";
 
             return generatedMethod.Indent();
-        }
-
-        private static string GenerateClientMethodParameters(MethodInfo method)
-        {
-            var parameters = Reflector.BuildParametersList(method, false);
-            var parametersWithContext = "UserContextContract userContext" + (parameters.Length == 0 ? "" : ", " + parameters);
-
-            return parametersWithContext;
         }
     }
 }

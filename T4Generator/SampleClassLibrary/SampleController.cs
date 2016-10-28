@@ -53,5 +53,11 @@ namespace SampleClassLibrary
         public void SaveColumnSort(SampleInputContract contract)
         {
         }
+
+        [HttpPost]
+        [Route("views/update-predefined/{isTsComplete:bool}")]
+        public void UpdatePredefinedViews([FromUri] bool isTsComplete)
+        {
+        }
     }
 }

@@ -18,7 +18,6 @@ namespace Clients
         List<SampleClassLibrary.SampleOutputContract> GetAllAvailableColumns(SampleClassLibrary.SampleEnum enumParameter);
         void SaveColumnSort(SampleClassLibrary.SampleInputContract contract);
     }
-
 }
 
 

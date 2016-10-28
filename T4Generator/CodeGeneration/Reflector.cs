@@ -157,17 +157,18 @@ namespace CodeGeneration
 
                 switch (type.Name)
                 {
-                    case "String": return "string";
-                    case "Int16": return "short";
-                    case "UInt16": return "ushort";
-                    case "Int32": return "int";
-                    case "UInt32": return "uint";
-                    case "Int64": return "long";
-                    case "UInt64": return "ulong";
+                    case "String":  return "string";
+                    case "Int16":   return "short";
+                    case "UInt16":  return "ushort";
+                    case "Int32":   return "int";
+                    case "UInt32":  return "uint";
+                    case "Int64":   return "long";
+                    case "UInt64":  return "ulong";
                     case "Decimal": return "decimal";
-                    case "Double": return "double";
-                    case "Object": return "object";
-                    case "Void": return "void";
+                    case "Double":  return "double";
+                    case "Boolean": return "bool";
+                    case "Object":  return "object";
+                    case "Void":    return "void";
 
                     default:
                         {
