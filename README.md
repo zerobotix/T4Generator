@@ -1,6 +1,6 @@
 # T4Generator
 
-some examples of code generation using T4
+some examples of code generation
 
 tools:
 - t4 (text template transformation toolkit)
