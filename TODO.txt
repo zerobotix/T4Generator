@@ -1,0 +1,11 @@
+client generation:
+public decimal GetCrossCourse(UserContextContract, DateTime tradeDate)
+{
+    var url = string.Format("url/{0}", tradeDate.ToString("yyyy-MM-dd"));
+    var request = CreateRequest(userContext, HttpMethod.Get, url);
+    var response = SendRequest<decimal>(request);
+
+    return response;
+}
+
+BasePatchContract
