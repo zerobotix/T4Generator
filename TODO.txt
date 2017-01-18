@@ -11,3 +11,5 @@ public decimal GetCrossCourse(UserContextContract, DateTime tradeDate)
 BasePatchContract
 
 SymbolsController doesn't need context
+
+HttpPost/get sometimes omitted
