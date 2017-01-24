@@ -15,3 +15,5 @@ SymbolsController doesn't need context
 HttpPost/get sometimes omitted
 
 url can be like url/{symbolId}?foo=100&bar=lol
+
+auto-generate admin methods also
