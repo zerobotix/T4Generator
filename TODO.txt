@@ -15,3 +15,8 @@ SymbolsController doesn't need context
 HttpPost/get sometimes omitted
 
 url can be like url/{symbolId}?foo=100&bar=lol
+
+HttpDelete action can return OkResult instead of void, but in client we return void anyway
+
+Controllers must usually accept specific List or Array in parameters, and Clients method must accept IEnumerable
+Otherwise, Clients must return specific List/Array instead of IEnumerable and IList, and Controllers can return anything
